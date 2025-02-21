@@ -1,0 +1,40 @@
+name: ページ更新
+
+# mainブランチへのプッシュがトリガー
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    # ubuntu最終環境で実行
+    runs-on: ubuntu-latest
+
+    steps:
+      # リポジトリからコードをチェックアウト
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+      # Node.js ver.20.11.0をセットアップ
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '20.11.0'
+
+      # プロジェクトのあるproディレクトリへ移動
+      # 依存環境をインストール
+    - name: Install dependencies
+      working-directory: pro
+      run: npm install
+
+      # プロジェクトをビルド
+    - name: Build the project
+      working-directory: pro
+      run: npm run build
+
+    - name: Githubページにデプロイ
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: pro/build
